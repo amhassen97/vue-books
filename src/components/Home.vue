@@ -13,7 +13,8 @@ const searchInputStore = useSearchInputStore()
 const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
   queryKey: ['bookSearch', ...[searchInputStore.searchValue ?? []]],
   queryFn: () => searchOpenLibraryBooks(searchInputStore.searchValue),
-  enabled: searchInputStore.fetchEnabled
+  enabled: searchInputStore.fetchEnabled,
+  refetchOnWindowFocus: false
 })
 
 /* useBookSearch(
@@ -71,9 +72,29 @@ const handleSearch = async () => {
     <div v-if="searchInputStore.searchValue?.trim() && (isLoading || isFetching)">Loading...</div>
     <!-- <div v-else-if="isError">Error: {{ error.message }}</div> -->
     <div v-else-if="data && Object.keys(data)?.length > 0">
-      Data:
+      <!-- Data:
       <div>
         <pre>{{ JSON.stringify(data, null, 2) }}</pre>
+      </div>
+     -->
+
+      <div class="flex gap-2 justify-evenly items-center w-100 flex-wrap">
+        <div class="card w-70 bg-base-100 shadow-xl" v-for="book in data?.docs" :key="book?.key">
+          <figure class="px-10 pt-10">
+            <img
+              :src="`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`"
+              alt="Shoes"
+              class="rounded-xl"
+            />
+          </figure>
+          <div class="card-body items-center text-center">
+            <h2 class="card-title">{{ book.title }}</h2>
+            <p>{{ Array.isArray(book.author_name) ? book.author_name?.[0] : book.author_name }}</p>
+            <div class="card-actions">
+              <button class="btn btn-primary">Buy Now</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
